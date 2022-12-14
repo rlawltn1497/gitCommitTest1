@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--configuration에 대한  DTD 선언부 - 마이바티스 설정관련 xml 문법을 import하는 방법!  -->
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- DB연결을 위한 properties 가져오는방법 -->
+	<properties resource="driver.properties"></properties>
+	
+	<!--  settings : 마이바티스 프레임워크에서 다양한 옵션 기능을 설정할수있는 영역 -->
+	
+	<settings>
+		<!--jdbcTypeForNull : JDBC타입을 파라미터에 제공하지 않을때 null값을 처리한 JDBC타입을 명시한다. 일부 드라이버는 칼럼의 JDBC타입을 정의하도록 요구하지만 대부분은 NULL, VARCHAR 나 OTHER 처럼 일반적인 값을 사용해서 동작한다.  -->
+  		<setting name="jdbcTypeForNull" value="NULL"/> <!-- 시험나옴 -->
+	</settings>
+	
+	<!-- Mybatis에서 사용할 별칭=Alias을 설정할수 있음 -->
+	<typeAliases>
+		<typeAlias type="com.kh.mybatis.board.model.vo.Board" alias = "Board"/><!-- 시험문제 나옴 -->
+		<typeAlias type="com.kh.mybatis.board.model.vo.Reply" alias = "Reply"/><!-- 시험문제 나옴 -->
+		<typeAlias type="com.kh.mybatis.member.model.vo.Member" alias = "Member"/><!-- 시험문제 나옴 -->
+	</typeAliases>
+
+
+	<!--environment's' : DB에 환경설정을 할수있다. DB가 만약 두개 이상인경우도 지원함  -->
+    <environments default="development">
+    <!--environment : 1개의 DB설정을 할수있음. DB이름은 id를 참고한다.-->
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <!-- POOL 관련 설정, 특별한일이 없으면 POOLED 상태를 유지한다. -->
+<!--        <dataSource type="POOLED">
+        <property name="driver" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
+        <property name="username" value="WEB"/>
+        <property name="password" value="WEB"/>
+      </dataSource>-->
+      
+      <dataSource type="POOLED">
+        <property name="driver" value="${db.driver}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+      </dataSource>
+      
+    </environment>
+    <!--DB가 여러개인 경우 하단부에 environment를 추가하여 작성필요 -->
+  </environments>
+  <!--mapper's' : 실제 SQL과 관련된 mapper의 경로를 설정하는곳  -->
+  <mappers>
+  <!-- Spring과 servlet 프로젝트에서는 앞에 / 이 있어야함 -->
+<!--      <mapper resource="/mappers/member/member-mapper.xml"/>-->
+<!--     <mapper resource="/mappers/board/board-mapper.xml"/>-->
+    <mapper resource="mappers/member/member-mapper.xml"/>
+    <mapper resource="mappers/board/board-mapper.xml"/>
+    <!-- 하단부에 mapper를 추가할수있음 -->
+  </mappers>
+</configuration>

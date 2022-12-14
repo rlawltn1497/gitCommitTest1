@@ -1,0 +1,81 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>03_mybatis_maven</groupId>
+  <artifactId>03_mybatis_maven</artifactId>
+  <version>1.0.0</version>
+  <!-- version 적는방법-->
+  <!-- Major.minor.Service-->
+  <!-- Major 버전: 출시 기준으로 1.0 그 이후부터는 기획에 따라 2.0, 3.0 버전으로 올라가는 중요한 버전-->
+  <!-- Minor 버전: 이팩트가 크진 않지만 중요한 기능이 추가되거나 변경이 있는 minor 한 변경버전-->
+  <!-- Service 버전 : 에러나 버그 fix하는 버전-->
+  <name>Test maven Project</name>
+  <description>시험버전입니다.</description>
+  
+  <!-- dependencies : 외부 Library의 의존성을 추가하는 방법-->
+  <!-- 프로젝트 우클릭 run as -> Maven install , 프로젝트 우클릭 Maven -> update project-->
+  <dependencies>
+ 	 <dependency>
+  		<groupId>org.projectlombok</groupId>
+	 	<artifactId>lombok</artifactId>
+	 	<version>1.18.24</version>
+ 	 	<scope>provided</scope>
+  	 </dependency>
+
+
+	 <dependency>
+		<groupId>org.mybatis</groupId>
+		<artifactId>mybatis</artifactId>
+		<version>3.5.10</version>
+	</dependency>
+
+
+	<dependency>
+		<groupId>com.oracle.database.jdbc</groupId>
+		<artifactId>ojdbc6</artifactId>
+		<version>11.2.0.4</version>
+	</dependency>
+
+	<!-- log4j dependency 추가 -->
+	<dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-api</artifactId>
+		<version>2.18.0</version>
+	</dependency>
+
+
+	<dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-core</artifactId>
+		<version>2.18.0</version>
+	</dependency>
+
+
+	<dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-slf4j-impl</artifactId>
+		<version>2.18.0</version>
+	</dependency>
+
+</dependencies>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <release>17</release>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

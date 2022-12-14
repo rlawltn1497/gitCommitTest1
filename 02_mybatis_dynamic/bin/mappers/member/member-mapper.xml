@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--mapper DTD 마이바티스의 mapper xml 문법을 지원하기 위한 import부  -->
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- mapper영역 : 실제 동작할 sql이 들어가는 자리. namespace로 외부에서 접근가능 ※짧게 쓰는걸 추천한다.-->  
+<mapper namespace="memberMapper">
+	
+	<!-- resultMap : VO-Table간의 맵핑 셋팅 -->
+	<resultMap type="Member" id="memberResultMap">
+		<!-- id = PK(기본키) 지정할수 있음 -->
+		<id     property="no"  			column="NO"/>
+		<result property="id"  			column="ID"/>
+		<result property="password"  	column="PASSWORD"/>
+		<result property="role"  		column="ROLE"/>
+		<result property="name"  		column="NAME"/>
+		<result property="phone"  		column="PHONE"/>
+		<result property="email"  		column="EMAIL"/>
+		<result property="address"  	column="ADDRESS"/>
+		<result property="hobby"  		column="HOBBY"/>
+		<result property="status"  		column="STATUS"/>
+		<result property="enrollDate"  	column="ENROLL_DATE"/>
+		<result property="modifyDate"  	column="MODIFY_DATE "/>
+	</resultMap>
+	
+	<!-- SQL - SELECT -->
+	<sql id="selectMemberSql">SELECT * FROM MEMBER</sql>
+	
+	<!-- SELECT 문 시작-->
+	<select id="selectCount" resultType="int">
+		 SELECT COUNT(*) FROM MEMBER
+	</select>
+	
+	<!-- resultMap : Class와 테이블간의 맵핑이 필요할때 쓰는 옵션 -->
+	<select id="selectAll" resultMap="memberResultMap">
+		<include refid="selectMemberSql"/>
+	</select>
+	
+	
+	<!-- parameterType : 외부에서 SQL인자로 넣을 Type -->
+	<select id="selectMember" resultMap="memberResultMap" parameterType="String">
+		<include refid="selectMemberSql"/>
+		WHERE ID = #{id} AND STATUS = 'Y'
+	</select>
+	
+	<!-- SELECT문 끝 -->
+	
+	<!-- INSERT문 시작 -->
+	<!-- parameterType : class 이름 / 별명 -->
+	<!-- key가 있을 경우 useGeneratedKeys을 사용하며 마이바티스에서 key 사용을 알림 -->
+	<!-- useGeneratedKeys 속성을 사용할 때 keyColumn, keyProperty 속성이 같이 쓰입니다. -->
+	<!-- useGeneratedKeys = "true"(기본값 false), keyColumn = [PK 컬럼명], keyProperty = [매핑할 변수명] -->
+	<!-- useGeneratedKeys : insert나 update됨가 동시에 자동생성된 키를 가져올 수 있는 속성으로 true로 설정 (default: false) -->
+	<!-- key는 마이바티스 레벨에서 Pool 활용시 사용됨 -->
+	<!-- keyColumn : DB에서 사용하는 PK의 이름 -->
+	<!-- keyProperty : 클래스, 마이바티스에서 사용할 키 이름 -->
+	<!-- key 설정은 생략 가능, 없어도 기능적으로는 문제 없음 -->
+	
+	<insert id="insertMember" parameterType="Member"
+		useGeneratedKeys="true" keyColumn="NO" keyProperty="no">
+    	INSERT INTO MEMBER (
+        NO, 
+        ID, 
+        PASSWORD, 
+        ROLE,
+        NAME, 
+        PHONE, 
+        EMAIL, 
+        ADDRESS, 
+        HOBBY, 
+        STATUS, 
+        ENROLL_DATE, 
+        MODIFY_DATE
+    ) VALUES(
+        SEQ_UNO.NEXTVAL, 
+        #{id}, 
+        #{password}, 
+        DEFAULT, 
+        #{name}, 
+        #{phone}, 
+        #{email}, 
+        #{address},
+        #{hobby},
+        DEFAULT,
+        DEFAULT,
+        DEFAULT
+    )
+	</insert>
+	<!-- INSERT문 끝 -->
+	
+	<!-- UPDATE문 시작 -->
+	<update id="updateMember" parameterType="Member">
+		UPDATE MEMBER 
+			SET 
+				NAME=#{name},
+				PHONE=#{phone},
+				EMAIL=#{email},
+				ADDRESS=#{address},
+				HOBBY=#{hobby},
+				MODIFY_DATE=SYSDATE 
+				WHERE NO=#{no}
+	</update>
+		<!-- UPDATE문 끝 -->
+	
+	<!-- DELETE문 시작 -->
+	<delete id="deleteMember" parameterType="int">
+		DELETE FROM MEMBER WHERE NO = #{no}
+	</delete>
+	<!-- DELETE문 끝 -->
+		
+</mapper>

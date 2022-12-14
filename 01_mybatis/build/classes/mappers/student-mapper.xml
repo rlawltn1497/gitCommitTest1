@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--mapper DTD 마이바티스의 mapper xml 문법을 지원하기 위한 import부  -->
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<!-- mapper영역 : 실제 동작할 sql이 들어가는 자리. namespace로 외부에서 접근가능 ※짧게 쓰는걸 추천한다.-->  
+<mapper namespace="studentMapper">
+  <!-- 이곳에 쿼리를 추가할수있습니다. -->
+  
+  <!-- insert절 -->
+  <insert id="insert">
+  	    INSERT INTO STUDENT VALUES(SEQ_STUDENT.NEXTVAL,'배창민', '01011111111',
+ 					'test1234@email.com', '서울시 강남구 논현동',DEFAULT)
+  </insert>
+  <!-- insert절 끝 -->
+  
+  <!-- String name 인자를 처리가능한 코드 -->
+  <!-- name은 dao로 부터 넘어온 파라메터 이름이 된다. -->
+  <insert id="insertByName" parameterType="string">
+  	    INSERT INTO STUDENT VALUES(SEQ_STUDENT.NEXTVAL,#{name}, '01045072620',
+ 					'test1234@email.com', '서울시 강남구 도곡동',DEFAULT)
+  </insert>
+  <!-- insert절 끝 -->
+  
+  <!-- VO인자 처리하는 코드 -->
+  <!-- 처리법 : parameterType에 패키지를 포함한 풀 네임을 쓰거나 별명(Alias) 지정-->
+  <!-- ※ 주의 : #{} 표기시 반드시 객체의 맴버 변수명과 일치해야 맵핑이 가능하다. (컬럼명아님) -->
+  <!-- 선언 : <typeAlias type="com.kh.mybatis.model.vo.Student" alias = "student"/> -->
+  <!-- <insert id="insertByAllParam" parameterType="com.kh.mybatis.model.vo.Student"> -->
+  <insert id="insertByAllParam" parameterType="student">
+  	    INSERT INTO STUDENT VALUES(SEQ_STUDENT.NEXTVAL,
+  	    #{name}, #{tel}, #{email}, #{address},DEFAULT)
+  </insert>
+  <!-- insert절 끝 -->
+  
+   <!-- Map으로 파라메터 전달하는 방법 -->
+   <!-- 사용처 : 파라메터가 VO외에도 페이지나 다양한 정보를 가지고 있을때, 복잡한 쿼리문에서 사용 -->
+  <insert id="insertByAllParamMap" parameterType="map">
+  	    INSERT INTO STUDENT VALUES(SEQ_STUDENT.NEXTVAL,
+  	    #{name}, #{tel}, #{email}, #{address},DEFAULT)
+  </insert>
+  <!-- insert절 끝 -->
+  
+  <!-- update 시작 -->
+  <update id="updateByName" parameterType="student">
+  	UPDATE STUDENT SET STUDENT_TEL = #{tel}, 
+		   STUDENT_ADDR = #{address}, 
+		   STUDENT_EMAIL = #{email}
+	WHERE  STUDENT_NAME = #{name}
+  </update>
+  <!-- update 끝 -->
+  
+  <!-- Delete -->
+	<delete id="deleteByName" parameterType="string">
+		DELETE FROM STUDENT WHERE STUDENT_NAME = #{name}
+	</delete>
+  <!-- Delete 끝 -->
+  
+  <!-- select절 시작 -->
+  <!-- resultType :  결과값에 대한 Type을 정의하는 옵션 -->
+  <select id="selectCount" resultType="int">
+		SELECT COUNT(*) FROM STUDENT
+  </select>
+  
+  <!--  select문을 활용하여 Table과 POJO(VO)와 맵핑시키는 방법 3가지 -->
+  <!-- 1. Table의 이름과 객체이름을 완벽히 일치시킨다.(JPA/ORM 방식) 이 방식은 안쓸것이다 XX-->
+  <!-- 2. 'as' 문법을 통해서 DB의 컬럼명과 객체 이름을 일치 시키는 방법이 있다 이방법은 조금 수월하다.-->
+  <!-- 3. resultMap을 작성하여 DB와 객체 이름을 일치 시킨다. -->
+  
+  <!-- 2번방법 : 'as'를 통해 맵핑시키는 방법 -->
+  <!-- <select id="selectByNo" parameterType="int" resultType="com.kh.mybatis.model.vo.Student"> 이것도 된다 시험나옴-->   
+  <select id="selectByNo" parameterType="int" resultType="student">
+  	SELECT 
+  		STUDENT_NO 		  as no,
+  		STUDENT_NAME 	  as name,
+ 		STUDENT_TEL 	  as tel,
+ 		STUDENT_EMAIL 	  as email,
+ 		STUDENT_ADDR 	  as address,
+ 		REG_DATE          as regDate
+  	FROM STUDENT WHERE STUDENT_NO = #{no}         
+  </select>
+  
+  <!-- 3번방법 : ResultMap을 통해 맵핑 시키는 방법 -->
+  <!--  resultMap이란: Class와 Table간의 네이밍을 맵핑시키는 태그! -->
+  <!--  type : 변환할 Class의 이름(별명 or 풀패키지 네임) -->
+  <!--  id : resultMap을 인식할 id -->
+	<resultMap type="student" id="studentMap">
+		<!-- property : Class의 멤버변수이름, column : DB의 컬럼명 -->
+		<result property="no"      column="STUDENT_NO" />
+		<result property="name"    column="STUDENT_NAME" />
+		<result property="tel"     column="STUDENT_TEL" />
+		<result property="email"   column="STUDENT_EMAIL" />
+		<result property="address" column="STUDENT_ADDR" />
+		<result property="regDate" column="REG_DATE" />
+	</resultMap>
+	
+	<!-- resultMap을 사용할때는 반드시 resultMap의 정의가 필요하다. -->
+	<select id="selectByNoV2" parameterType="int" resultMap="studentMap">
+		SELECT * FROM STUDENT WHERE STUDENT_NO = #{no}
+	</select>
+	
+	<!-- 반복되는 쿼리문을 별도의 문구로 빼내는 방법 -->
+	<sql id="selectSql">SELECT * FROM STUDENT</sql>
+	
+	
+	<!-- 컬랙션 Map을 통해 결과를 리턴받는 방법, Map의 Key는 DB컬럼명을 갖고, Value는 값이 저장됨  -->
+	<!-- 만약 객체명으로 가져오기 위해서는 as 문법을 통해 컬럼명을 변경을 해야한다. -->
+	<select id="selectByNoMap" parameterType="int" resultType="map">
+	<!-- SELECT * FROM STUDENT WHERE STUDENT_NO = #{no} -->
+	<include refid="selectSql" />WHERE STUDENT_NO = #{no}	
+	</select>
+	
+	<!-- SELECT LIST로 가져오는 법(이 친구는 결과값이 다중행일때 쓴다.) -->
+	<!-- 1. as 로 맵핑하는 법 -->
+	<select id="selectAll" resultType="student">
+		SELECT 
+  		STUDENT_NO 		  as no,
+  		STUDENT_NAME 	  as name,
+ 		STUDENT_TEL 	  as tel,
+ 		STUDENT_EMAIL 	  as email,
+ 		STUDENT_ADDR 	  as address,
+ 		REG_DATE          as regDate
+  	FROM STUDENT
+	</select>
+	
+	<!-- 2. ResultMap으로 맵핑하는 법 -->
+	<!-- resultMap을 사용해야한다. -->
+	<select id="selectAllWithResultMap" resultMap="studentMap">
+		SELECT * FROM STUDENT
+	</select>
+	
+	<!-- 3. 컬랙션 Map으로 맵핑하는 법 -->
+	<!-- 조회할때 컬럼값을 제한적으로 조회할수있다. -->
+	<select id="selectAllWithListMap" resultType="map">
+		SELECT STUDENT_NO, STUDENT_NAME, STUDENT_TEL  FROM STUDENT
+	</select>
+	
+	<!--  email Keyword로 가져오는 쿼리 -->
+	<!-- '||' : 마이 바티스에서 문자열을 합치는 방법! -->
+	<select id="selectByEmailKeyword" parameterType="String" resultMap="studentMap">
+		SELECT * FROM STUDENT
+		WHERE STUDENT_EMAIL LIKE '%' || #{email} || '%'
+	</select>
+	
+	
+	  	
+  	<!-- select절 끝 -->
+  
+  
+</mapper>
